@@ -112,5 +112,28 @@ SELECT h.hacker_id
  GROUP BY 1,2
  ORDER BY  cnt DESC, hacker_id ASC 							-- (1)
  
+ 
+ 
+ 
+ 
+## AGG
+-- A median is defined as a number separating the higher half of a data set from the lower half. 
+-- Query the median of the Northern Latitudes (LAT_N) from STATION and round your answer to  decimal places.
+-- mysql median  함수 존재하지 않음 
+
+SET @rowindex := -1 ;	
+WITH CTE AS (													# CTE to separate the subquery for improved legibility 
+				SELECT  
+					@rowindex := @rowindex+1 AS rowindex
+					, LAT_N 
+				FROM STATION
+				ORDER BY LAT_N 										# 1. SORTY THE ARRAY
+)
+SELECT ROUND(AVG(LAT_N),4) as median
+FROM CTE
+WHERE CTE.rowindex IN (Floor(@rowindex/2), CEIL(@rowindex/2)); 		# 2. Find the value of the middle item in the array.
+-- the length of array(rowindex) is even >> middle two indicies are actually equal
+-- the length of array(rowindex) is odd >> average the two middle indices
+
 
 	
