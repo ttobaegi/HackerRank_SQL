@@ -135,5 +135,11 @@ WHERE CTE.rowindex IN (Floor(@rowindex/2), CEIL(@rowindex/2)); 		# 2. Find the v
 -- the length of array(rowindex) is even >> middle two indicies are actually equal
 -- the length of array(rowindex) is odd >> average the two middle indices
 
-
-	
+## Alternative Query
+-- Write a query to print all prime numbers less than or equal to 1000. 소수
+-- Print your result on a single line, and use the ampersand (&) character as your separator (instead of a space).
+-- For example, the output for all prime numbers  <= 10 would be:2&3&5&7
+SET @prime := 0;
+SELECT CONCAT(@prime = @prime+1,"&"
+FROM 
+'
