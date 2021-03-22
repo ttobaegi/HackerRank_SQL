@@ -10,7 +10,7 @@ SELECT  ROW_NUMBER() OVER (
 		, price_usd/cogs_usd as Margin
 FROM order_items
 GROUP BY product_id
-
+	
 -- 2) Finding top N rows of every group
 WITH margin 
 AS (
