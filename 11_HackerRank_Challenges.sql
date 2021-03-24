@@ -1,3 +1,4 @@
+/** Hackerrank : Challenges **/
 1. hacker_id | name | total # challenges by each student
 2. order by #total DESC, hacker_id ASC
 3. #total 같은 hacker_id존재 & #total < max(#total) :: EXCLUDE them
@@ -6,6 +7,53 @@
 3. count >=2 중 MAX(#total) 아닌것 제외
 4. order by 
 ;
+-- hacker_id | total |
+select * from hackers;
+select * from challenges;
+
+WITH a as 
+	(
+		select c.hacker_id, h.name, count(challenge_id) as total
+		from Challenges c
+        left join Hackers h on c.hacker_id=h.hacker_id
+		group by hacker_id
+		order by total desc
+	)
+, b as (
+	select total , count(hacker_id) cnt from a group by total 
+		/* FILTER OUT CASE DUPLICATE TOTAL BUT NOT MAX TOTAL */
+	) 
+, c as (
+	select total max from b order by total desc limit 1 
+		/* MAX TOTAL */
+) , d as (
+	select * from b where cnt > 1
+		/* DUPLICATE TOTAL */
+) 
+select * from a 
+where (total not in (select total from d)) 
+	/* UNIQUE TOTAL */
+	OR (total in (select total from d ) and total in (select max from c) )
+	/* FILTER OUT CASE DUPLICATE TOTAL BUT NOT MAX TOTAL */
+Order by total desc, hacker_id ASC
+;
+    
+## MY SOLUTION 2
+WITH c AS( 
+SELECT hacker_id, count(challenge_id) as total 
+FROM Challenges
+GROUP BY hacker_id
+)
+SELECT h.hacker_id, h.name, c.total
+FROM Hackers h
+INNER JOIN  c ON h.hacker_id = c.hacker_id 
+WHERE total in 
+	(select total as cnt from c group by total having count(hacker_id)=1 OR total = (select max(total) from c))
+Order by 3 desc, 1 asc
+
+
+
+
 /**
 create table challenges(challenge_id integer, hacker_id integer);
 
@@ -37,32 +85,3 @@ INSERT INTO `hackers` (`hacker_id`,`name`) VALUES (62743,'Frank');
 INSERT INTO `hackers` (`hacker_id`,`name`) VALUES (88255,'Patrick');
 INSERT INTO `hackers` (`hacker_id`,`name`) VALUES (96196,'Lisa');
 **/
-
--- hacker_id | total |
-select * from hackers;
-select * from challenges;
-with a as 
-(
-select hacker_id, count(challenge_id) as total
-from Challenges
-group by hacker_id
-),
-b as (
-select total, count(hacker_id) as cnt
-from a
-group by total
-),
-c as
-(
-select total as max from b order by 1 desc limit 1
-)
--- , d as (
-select * from a,b where b.cnt = 1
-union 
-select a.* from a,b,c where cnt !=1 and cnt = c.max 
--- )
-select d.hacker_id, name, total
-from d 
-left join hackers h 
-on d.hacker_id = h.hacker_id
-order by 3 desc, 1 asc ; 
